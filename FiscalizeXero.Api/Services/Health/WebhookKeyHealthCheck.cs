@@ -55,9 +55,13 @@ namespace FiscalizeXero.Api.Services.Health
                 var contested = report.Entries.TryGetValue(CompanyConnections.CompanyConnectionsHealthCheck.Name, out var ce) &&
                                 ce.Data.TryGetValue(CompanyConnections.CompanyConnectionsHealthCheck.ContestedKey, out var m) && m is int shared
                     ? shared : (int?)null;
+                var running = Version.AppVersionInfo.Current(ctx.RequestServices.GetRequiredService<IHostEnvironment>().EnvironmentName);
                 var body = new
                 {
                     status = report.Status.ToString(),
+                    version = running.Version,
+                    commit = running.Commit,
+                    startedAt = running.StartedAt,
                     webhookKeyConfigured = configured,
                     companiesWithDuplicateConnections = duplicates,
                     xeroOrganisationsSharedBetweenCompanies = contested,

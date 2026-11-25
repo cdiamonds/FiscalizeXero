@@ -8,6 +8,7 @@ import { LocalService } from '../../core/services/local/local.service';
 import { CompaniesService, FiscalyzeCompany } from '../../core/services/xero/companies.service';
 import { SessionService } from '../../core/services/session/session.service';
 import { ClientConfigService } from '../../core/services/xero/client-config.service';
+import { RunningVersion, VersionService } from '../../core/services/version/version.service';
 
 interface CompanyRow {
   id: number;
@@ -32,6 +33,7 @@ export class NavBar implements OnInit {
   private clientConfigService = inject(ClientConfigService);
   private router = inject(Router);
   private sessionService = inject(SessionService);
+  readonly versions = inject(VersionService);
 
   @Input() onToggleSidebar?: () => void;
   @Input() collapsed = false;
@@ -184,7 +186,19 @@ export class NavBar implements OnInit {
   onSidebarToggle(): void { this.toggleSidebar.emit(); this.onToggleSidebar?.(); }
   toggleTheme(): void { this.themeService.toggle(); }
 
-  toggleProfile(): void { this.showProfileDropdown.update((v) => !v); this.showCompanyDropdown.set(false); }
+  toggleProfile(): void {
+    this.showProfileDropdown.update((v) => !v);
+    this.showCompanyDropdown.set(false);
+    if (this.showProfileDropdown()) this.versions.load();
+  }
+
+  /** "Commit 76e4408027c7, built 25 Nov 2026 09:18" for the version line's tooltip. */
+  versionTitle(label: string, v: RunningVersion | null): string {
+    if (!v) return '';
+    const when = v.builtAt ? new Date(v.builtAt).toLocaleString() : null;
+    return [`${label} ${v.version}`, v.commit ? `commit ${v.commit}` : null, when ? `built ${when}` : null,
+            v.startedAt ? `running since ${new Date(v.startedAt).toLocaleString()}` : null].filter(Boolean).join(' · ');
+  }
   toggleCompany(): void { this.showCompanyDropdown.update((v) => !v); this.showProfileDropdown.set(false); }
 
   onSearchInput(value: string): void { this.orgSearch.set(value); }

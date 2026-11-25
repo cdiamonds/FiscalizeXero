@@ -3,10 +3,14 @@
   "version": "0.1.33",
   "scripts": {
     "ng": "ng",
+    "prestart": "node tools/write-version.mjs",
     "start": "ng serve --port 50910",
+    "prebuild": "node tools/write-version.mjs",
     "build": "ng build",
+    "prebuild:prod": "node tools/write-version.mjs",
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
+    "pretest": "node tools/write-version.mjs",
     "test": "ng test"
   },
   "prettier": {

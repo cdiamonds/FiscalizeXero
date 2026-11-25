@@ -385,5 +385,8 @@ app.MapControllers();
 // Liveness, database reachability, whether the webhook key is set and the connection invariants, for IIS / uptime monitoring.
 // Anonymous; reports statuses and a true/false flag, never configuration values.
 app.MapHealthChecks("/health", FiscalizeXero.Api.Services.Health.WebhookKeyHealthCheck.ResponseOptions());
+// Which build is running (version, commit, build and start time). Public: no configuration value is in it.
+app.MapGet("/api/version", (IHostEnvironment env) => Results.Ok(FiscalizeXero.Api.Services.Version.AppVersionInfo.Current(env.EnvironmentName)))
+   .AllowAnonymous().ExcludeFromDescription();
 
 app.Run();

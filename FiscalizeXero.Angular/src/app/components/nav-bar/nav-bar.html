@@ -188,6 +188,11 @@
                   title="Ends your sign-in on every phone, computer and browser, for example after losing a device">
             Sign out of all devices
           </button>
+          <div class="mt-1 border-t border-slate-100 px-4 pb-1 pt-2 text-[11px] leading-relaxed text-slate-400 dark:border-white/5 dark:text-slate-500">
+            <span [title]="versionTitle('Web', versions.web())">Web {{ versions.web()?.version || '…' }}</span>
+            <span aria-hidden="true"> · </span>
+            <span [title]="versionTitle('API', versions.api())">API {{ versions.apiUnavailable() ? 'not reachable' : (versions.api()?.version || '…') }}</span>
+          </div>
         </div>
       </div>
     </div>
