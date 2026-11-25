@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <Version>1.0.64</Version>
+    <Version>1.0.65</Version>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -20,9 +20,12 @@
     </PackageReference>
     <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
     <PackageReference Include="Fiscalize.LayoutRenderer" Version="1.1.1" />
-    <!-- The renderer's PdfSharpCore asks for ImageSharp 1.0.4, which has known vulnerabilities. The renderer never decodes an
-         image (logos are embedded as they are), so the patched ImageSharp 3 is used instead, as on the Fiscalize platform. -->
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.2.1" />
+    <!-- No image library ships with this app. The layout renderer's PdfSharpCore declares SixLabors.ImageSharp, but the
+         renderer embeds logos with its own JPEG/PNG reader and never calls it (LayoutLogoWithoutImageLibraryTests proves a
+         logo renders with ImageSharp absent). The free ImageSharp versions (1.x, 2.x) have open security advisories and
+         the patched 3.2+ needs a paid licence, so it is excluded completely: no assembly is copied, no code is compiled
+         against it and its build-time licence check never runs. The version here only settles the dependency. -->
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.2.1" ExcludeAssets="all" PrivateAssets="all" />
     <PackageReference Include="PDFsharp" Version="6.2.4" />
     <PackageReference Include="QRCoder" Version="1.4.3" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />

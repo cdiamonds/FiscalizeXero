@@ -14,13 +14,13 @@ namespace FiscalizeXero.Api.Tests
     /// <summary>Fiscalize layouts for Xero: the mapper (Xero document to the renderer's document) and drawing it in this host.</summary>
     public class XeroLayoutMapperTests
     {
-        private static readonly IReadOnlyDictionary<string, LineTax> Taxes = XeroTaxResolver.Resolve(new[]
+        internal static readonly IReadOnlyDictionary<string, LineTax> Taxes = XeroTaxResolver.Resolve(new[]
         {
             new TaxRate { TaxType = "OUTPUT", Name = "VAT on Sales", EffectiveRate = 15m },
             new TaxRate { TaxType = "ZERORATED", Name = "Zero Rated", EffectiveRate = 0m }
         });
 
-        private static Invoice Invoice(string amounts = XeroLineAmountTypes.Exclusive) => new()
+        internal static Invoice Invoice(string amounts = XeroLineAmountTypes.Exclusive) => new()
         {
             InvoiceID = Guid.NewGuid(), InvoiceNumber = "INV-0042", Type = "ACCREC", Status = "AUTHORISED",
             DateString = "2026-11-23T00:00:00", DueDateString = "2026-12-23T00:00:00", LineAmountTypes = amounts,
@@ -38,7 +38,7 @@ namespace FiscalizeXero.Api.Tests
             }
         };
 
-        private static Contact FullContact() => new()
+        internal static Contact FullContact() => new()
         {
             ContactID = Guid.NewGuid(), Name = "Kopje Traders", FirstName = "Tendai", LastName = "Moyo", AccountNumber = "KOP001",
             EmailAddress = "accounts@kopje.example", CompanyNumber = "100123456" /* 9 digits: a VAT number, not a registration */,
@@ -54,7 +54,7 @@ namespace FiscalizeXero.Api.Tests
             PaymentTerms = new ContactPaymentTerms { Sales = new PaymentTerm { Day = 30, Type = "DAYSAFTERBILLDATE" } }
         };
 
-        private static FiscalRecord Record() => new()
+        internal static FiscalRecord Record() => new()
         {
             DocumentNumber = "INV-0042", DocumentType = FiscalDocumentType.Invoice, ReceiptNumber = 77, GlobalNumber = 1077,
             DeviceId = 38292, FiscalDayNumber = 12, VerificationCode = "ABCD-1234-EFGH-5678", QrCodeUrl = "https://fdms.zimra.co.zw/0000038292/x"
@@ -193,6 +193,41 @@ namespace FiscalizeXero.Api.Tests
             var pdf = FiscalLayoutRenderer.Render(reparsed, document);
             Assert.True(pdf.Length > 1000);
             Assert.Equal("%PDF", Encoding.ASCII.GetString(pdf, 0, 4));
+        }
+    }
+
+    /// <summary>
+    /// The layout renderer embeds logos with its own JPEG/PNG reader, so no image library ships with the app (ImageSharp
+    /// is excluded in the csproj: its free versions have open advisories and its patched versions need a paid licence).
+    /// </summary>
+    public class LayoutLogoWithoutImageLibraryTests
+    {
+        private const string Png = "iVBORw0KGgoAAAANSUhEUgAAAHgAAAAwCAIAAABVDSmEAAABL0lEQVR4nO3bsQ4BQRDG8T3R8oB6lWJKr0C5CZXeA3oCiUqzMbc389l89/3bYyf5mZBwpt3tUlR+G8AMJWhcggYlaFCCBiVoUIIGtW1deJ3OZeD292vUUfY8ti7VwyMdmjtr47YethB9ddDmI249sZt7RdDWSxzCvZYPQ4tQXnIa/0ZbKHH3apNvtOUod5zPDG3JyrOmMEMPFS20QdbZP4sT2oDKzomc0AMmaFCE0AZ/3/DMJYQeM0GDEjQoQYMSNChBgyKErnE/9AXOJYQeM0GD4oSu8HePnxM5oQvW2jOLFnq0mKErZKmdU5ihS761/3z+2w3qxyL8u9O5LyH5Rietdsdp/Bsdu9q69y6dW3eT9vSthrk/etIfOjGt5cPw7wkalKBBCRqUoEEJumB6A2RhUMMBzl/DAAAAAElFTkSuQmCC";
+        private const string Jpeg = "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAwAHgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDnKKK+7q9StW9lbQ/L8nyf+0uf3+Xlt0vvfzXY+EaK+7qKx+uf3T2v9Tv+n3/kv/2x8I0V93UUfXP7of6nf9Pv/Jf/ALY+EaK+7q8m/am/5J9Yf9hWP/0VNVQxXPJRscuN4Y+q4eVb2t+VXty/8E+aqKKiklC8Lya9TC4Stiqns6SuzwMDgMRj6vsqEbv8vNktFVGdm6sabX0sOFJuPv1Un5K/6r8j7OnwHUcb1KyT8ldffdfkXaKqpK698j3qwjhxkV4+YZPiMCuaWse6/XsfPZtw7i8sXPNc0O62+fYdRRRXknghX3dXwjX3dXFjPsn2vB3/AC+/7d/9uCiiiuE+2CiiigAryb9qb/kn1h/2FY//AEVNXrNeTftTf8k+sP8AsKx/+ipq1ofxEeXnf+4VfQ+aJDtQmqlW5RujIqpX6dwqoewm18V/wtp+pzcCRpfVqsl8XNr6WVvxuFFFFfVH3QU+Ftsg9DxTKfCMyD25rkx6g8NUVTaz/I8/NY0pYKqqvw8rv939W8y1RRRX5Qfg4V93V8I1vf8ACaeMf+hs17/wYy//ABVYV6LqWsz3skzeGW8/NFvmtt5X/wAz7Qor4v8A+E08Y/8AQ2a9/wCDGX/4qj/hNPGP/Q2a9/4MZf8A4quf6nLue9/rfR/59v70faFFfF//AAmnjH/obNe/8GMv/wAVR/wmnjH/AKGzXv8AwYy//FUfU5dw/wBb6P8Az7f3o+0K8m/am/5J9Yf9hWP/ANFTV4R/wmnjH/obNe/8GMv/AMVVPVfEGvatbrb6prep38KuHWO5unkUNgjIDEjOCefc1dPCuMk7nJj+JqWKw06Kg05IzahliySy9+1TUV7GCx1bBVPaUn/kz57LczxGXVfa0Hr1XRrs/wCrlIgg4IxRVwgEYIzSbV/uj8q+ohxXHl9+nr5M+3p8eQ5P3lF38np+X+ZWRGboPxqxGgQdck0+ivFzLO6+OjyW5Y9u/qz5zOeJsTmcfZW5Idlrf1f/AAwUUUV4p82f/9k=";
+
+        [Theory]
+        [InlineData("png")]
+        [InlineData("jpeg")]
+        public void A_layout_with_a_logo_renders_and_embeds_it_without_any_image_library(string kind)
+        {
+            var logo = Convert.FromBase64String(kind == "png" ? Png : Jpeg);
+            byte[] Render(bool withLogo)
+            {
+                var spec = LayoutSpec.Starter("A4", "modern");
+                spec.Header.ShowLogo = withLogo;
+                var issuer = new LayoutIssuer { LegalName = "Bedford Trading", Tin = "2000123456" };
+                var package = LayoutPackage.TryParse(LayoutPackage.Build(spec.Normalise(), 0, logo: withLogo ? logo : null, issuer: issuer).ToJson(), out var error)!;
+                Assert.True(package != null, error);
+                var document = XeroLayoutMapper.Map(new XeroLayoutSource { Document = XeroLayoutMapperTests.Invoice(), Contact = XeroLayoutMapperTests.FullContact(), TaxByType = XeroLayoutMapperTests.Taxes, Record = XeroLayoutMapperTests.Record() }, package.FieldsUsed);
+                return FiscalLayoutRenderer.Render(package, document);
+            }
+
+            var plain = Render(false);
+            var withLogo = Render(true);
+            Assert.Equal("%PDF", Encoding.ASCII.GetString(withLogo, 0, 4));
+            Assert.Contains("/Subtype /Image", Encoding.Latin1.GetString(withLogo).Replace("/Subtype/Image", "/Subtype /Image"));
+            Assert.True(withLogo.Length > plain.Length, "the logo should make the PDF bigger");
+            Assert.DoesNotContain(AppDomain.CurrentDomain.GetAssemblies(), a => a.GetName().Name == "SixLabors.ImageSharp");
         }
     }
 
