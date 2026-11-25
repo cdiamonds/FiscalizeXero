@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <Version>1.0.64</Version>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <UserSecretsId>7abcd5e2-8715-48ab-b0b3-c4400d195703</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
+    <PackageReference Include="Fiscalize.LayoutRenderer" Version="1.1.1" />
+    <!-- The renderer's PdfSharpCore asks for ImageSharp 1.0.4, which has known vulnerabilities. The renderer never decodes an
+         image (logos are embedded as they are), so the patched ImageSharp 3 is used instead, as on the Fiscalize platform. -->
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.2.1" />
+    <PackageReference Include="PDFsharp" Version="6.2.4" />
+    <PackageReference Include="QRCoder" Version="1.4.3" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
+
+    <!-- Direct pin: Microsoft.Data.SqlClient still pulls System.Security.Cryptography.Pkcs 9.0.4 (GHSA-846f-f764-76mx). -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Fonts used by the PDF fiscal stamp; served to PDFsharp by EmbeddedFontResolver. -->
+    <EmbeddedResource Include="Fonts\*.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FiscalizeXero.Fiscalize\FiscalizeXero.Fiscalize.csproj" />
+    <ProjectReference Include="..\FiscalizeXero.Shared\FiscalizeXero.Shared.csproj" />
+    
+    <ProjectReference Include="..\FiscalizeXero.Xero\FiscalizeXero.Xero.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The server keeps its own copies of these. Publishing them would either
+         overwrite real configuration or leave confusing extra files in the IIS
+         folder, so none of them are copied. -->
+    <Content Update="appsettings.Production.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Update="appsettings.Production.template.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Update="appsettings.Development.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- The server's appsettings.json is maintained by hand and must survive a deploy.
+       Ship the published copy as _appsettings.json so it is there for reference but
+       cannot overwrite the live one, rather than relying on remembering to rename it. -->
+  <Target Name="RenamePublishedAppSettings" AfterTargets="Publish">
+    <Move SourceFiles="$(PublishDir)appsettings.json" DestinationFiles="$(PublishDir)_appsettings.json" Condition="Exists('$(PublishDir)appsettings.json')" />
+    <Message Importance="high" Text="Published appsettings.json as _appsettings.json so it cannot overwrite the server copy." />
+  </Target>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FiscalizeXero.Api.Tests" />
+  </ItemGroup>
+
+</Project>

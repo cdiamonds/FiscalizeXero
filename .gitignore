@@ -1,0 +1,14 @@
+# Real production configuration lives only on the server, never in git.
+# The csproj also marks this file CopyToPublishDirectory=Never so a publish
+# cannot overwrite it. See appsettings.Production.template.json for the keys.
+FiscalizeXero.Api/appsettings.Production.json
+
+# Build output from publish.sh (versioned zips are deliverables, not source)
+publish/
+releases/
+
+# Build output (was tracked by mistake; every build dirtied the repo)
+**/bin/
+**/obj/
+**/logs/
+.DS_Store

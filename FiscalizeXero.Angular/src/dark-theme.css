@@ -1,0 +1,49 @@
+/* ─── Dark theme: Teal Slate (the Fiscalize platform's own) ───────────────────
+   One neutral hue, five solid surface steps. Tailwind v4 reads every grey from a CSS variable,
+   so re-pointing the ramp here restyles every dark:bg-slate-*, dark:border-slate-* and
+   dark:text-slate-* in the app without touching a template. Only active under .dark.
+
+   Surface ladder (higher = closer to the user)
+     gray-950  canvas
+     gray-900  chrome: sidebar, table headers, inputs
+     gray-800  card
+     gray-700  line + highest: default border, selected / active control
+     gray-600  strong line: input border, divider on a raised surface */
+html.dark {
+  color-scheme: dark;
+
+  --color-gray-50:  #f1f5f6;
+  --color-gray-100: #e8eef0;
+  --color-gray-200: #d3dde1;
+  --color-gray-300: #bcc9ce;
+  --color-gray-400: #a7b5bb;
+  --color-gray-500: #7e8e95;
+  --color-gray-600: #3b4e57;
+  --color-gray-700: #2a3a41;
+  --color-gray-800: #151e22;
+  --color-gray-900: #10171a;
+  --color-gray-950: #0a0f11;
+
+  --color-slate-50:  var(--color-gray-50);
+  --color-slate-100: var(--color-gray-100);
+  --color-slate-200: var(--color-gray-200);
+  --color-slate-300: var(--color-gray-300);
+  --color-slate-400: var(--color-gray-400);
+  --color-slate-500: var(--color-gray-500);
+  --color-slate-600: var(--color-gray-600);
+  --color-slate-700: var(--color-gray-700);
+  --color-slate-800: var(--color-gray-800);
+  --color-slate-900: var(--color-gray-900);
+  --color-slate-950: var(--color-gray-950);
+
+  --color-bg: #0a0f11;
+  --color-fg: #e8eef0;
+
+  --surface-0: var(--color-gray-950);
+  --surface-1: var(--color-gray-900);
+  --surface-2: var(--color-gray-800);
+  --surface-3: #1b262b;
+  --line: var(--color-gray-700);
+  --line-soft: #1c282d;
+  --line-strong: var(--color-gray-600);
+}

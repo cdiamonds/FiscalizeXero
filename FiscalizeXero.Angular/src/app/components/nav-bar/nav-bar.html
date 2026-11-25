@@ -1,0 +1,195 @@
+<header class="fz-bar fixed top-0 right-0 left-0 z-30 transition-[left] duration-300 ease-in-out"
+        [class.lg:left-64]="!collapsed"
+        [class.lg:left-16]="collapsed">
+  <div class="flex h-16 items-center justify-between px-4 lg:px-6">
+    <div class="flex items-center gap-3">
+      <button type="button"
+              (click)="onSidebarToggle()"
+              class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white lg:hidden"
+              aria-label="Toggle sidebar">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12h18M3 6h18M3 18h18"></path>
+        </svg>
+      </button>
+      <div class="hidden text-sm font-medium text-slate-500 dark:text-slate-400 sm:block">
+        Fiscalize for Xero
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <!-- Company switcher -->
+      <div class="relative" data-nav-dropdown>
+        <button type="button"
+                (click)="toggleCompany()"
+                class="group flex items-center gap-2 rounded-xl border border-slate-200/70 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-white hover:scale-[1.02] dark:border-white/5 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10">
+          <ng-container *ngIf="activeCompany() as ac; else noActiveTpl">
+            <img *ngIf="logoUrl(ac); else activeInitialsTpl" [src]="logoUrl(ac)" alt="" (error)="onLogoError(ac)" class="h-5 w-5 rounded-md object-cover" />
+            <ng-template #activeInitialsTpl>
+              <span class="flex h-5 w-5 items-center justify-center rounded-md bg-gradient-to-br from-primary-500 to-primary-600 text-[10px] font-bold text-white">{{ initialsFor(ac) }}</span>
+            </ng-template>
+            <span class="hidden max-w-[160px] truncate sm:inline">{{ ac.friendlyName || ac.name }}</span>
+          </ng-container>
+          <ng-template #noActiveTpl>
+            <span class="hidden sm:inline">Select company</span>
+          </ng-template>
+          <span class="sm:hidden">Company</span>
+          <svg class="h-4 w-4 text-slate-400 transition-transform" [class.rotate-180]="showCompanyDropdown()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9l6 6 6-6"></path>
+          </svg>
+        </button>
+
+        <div *ngIf="showCompanyDropdown()"
+             class="absolute right-0 mt-2 w-80 origin-top-right rounded-xl border border-slate-200 bg-white/95 py-1.5 shadow-xl backdrop-blur-md dark:border-white/10 dark:bg-slate-900/95"
+             style="animation: fadeIn 0.18s ease-out;">
+
+          <div class="px-3 pb-2 pt-1">
+            <div class="relative">
+              <svg class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input #orgSearchInput type="text" [ngModel]="orgSearch()" (ngModelChange)="onSearchInput($event)"
+                     placeholder="Search companies by name or role…" autocomplete="off" spellcheck="false"
+                     class="w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-7 text-xs outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 dark:border-white/10 dark:bg-slate-950 dark:text-white" />
+              <button *ngIf="orgSearch()" type="button" (click)="onSearchInput('')"
+                      class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-white/5 dark:hover:text-slate-200"
+                      aria-label="Clear search">
+                <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="switchError()" class="mx-3 mb-2 flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[11px] text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">
+            <svg class="mt-0.5 h-3 w-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            <span class="flex-1">{{ switchError() }}</span>
+            <button type="button" (click)="switchError.set(null)" class="text-rose-500 hover:text-rose-700 dark:text-rose-400" aria-label="Dismiss"><svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+          </div>
+
+          <div *ngIf="activeCompany() as ac" class="border-y border-slate-100 px-1 py-1 dark:border-white/5">
+            <div class="flex items-center gap-3 rounded-lg bg-brand-50/60 px-2 py-2 dark:bg-primary-500/10">
+              <img *ngIf="logoUrl(ac); else acInit" [src]="logoUrl(ac)" alt="" (error)="onLogoError(ac)" class="h-8 w-8 flex-shrink-0 rounded-lg object-cover" />
+              <ng-template #acInit>
+                <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 text-xs font-bold text-white">{{ initialsFor(ac) }}</span>
+              </ng-template>
+              <div class="min-w-0 flex-1">
+                <div class="truncate text-sm font-semibold text-slate-900 dark:text-white">{{ ac.friendlyName || ac.name }}</div>
+                <div class="flex items-center gap-1.5 text-[11px]">
+                  <span class="text-slate-500 dark:text-slate-400">Active</span>
+                  <span [ngClass]="statusFor(ac).cls" class="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider">
+                    <span class="h-1 w-1 rounded-full" [ngClass]="statusFor(ac).dot"></span>{{ statusFor(ac).label }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="max-h-72 overflow-y-auto py-1">
+            <div *ngIf="loadingCompanies()" class="px-3 py-4 text-center text-xs text-slate-500 dark:text-slate-400">
+              <div class="mx-auto h-4 w-4 animate-spin rounded-full border-2 border-brand-200 border-t-primary-500"></div>
+              <div class="mt-2">Loading companies…</div>
+            </div>
+            <div *ngIf="!loadingCompanies() && companiesError()" class="px-3 py-3 text-center">
+              <div class="text-xs text-amber-700 dark:text-amber-300">{{ companiesError() }}</div>
+              <div class="mt-2 flex items-center justify-center gap-2">
+                <button *ngIf="platformSignInNeeded()" type="button" (click)="signInAgain()" class="inline-flex items-center gap-1 rounded-md bg-primary-500 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-primary-600">
+                  Sign in again
+                </button>
+                <button type="button" (click)="retryLoadCompanies()" class="inline-flex items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/5">
+                  <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                  Try again
+                </button>
+              </div>
+            </div>
+            <div *ngIf="!loadingCompanies() && !companiesError() && otherCompanies().length === 0" class="px-3 py-4 text-center text-xs text-slate-500 dark:text-slate-400">
+              {{ orgSearch() ? 'No companies match "' + orgSearch() + '"' : (hasNoOtherCompanies() ? 'No other companies in your account' : '—') }}
+            </div>
+            <button *ngFor="let c of otherCompanies()"
+                    type="button"
+                    (click)="selectCompany(c)"
+                    [disabled]="switchingId() != null"
+                    class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors duration-150 hover:bg-slate-100 disabled:opacity-50 dark:hover:bg-white/5">
+              <img *ngIf="logoUrl(c); else cInit" [src]="logoUrl(c)" alt="" (error)="onLogoError(c)" class="h-8 w-8 flex-shrink-0 rounded-lg object-cover" />
+              <ng-template #cInit>
+                <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-slate-400 to-slate-500 text-xs font-bold text-white">{{ initialsFor(c) }}</span>
+              </ng-template>
+              <div class="min-w-0 flex-1">
+                <div class="truncate font-medium text-slate-900 dark:text-white">{{ c.friendlyName || c.name }}</div>
+                <div class="flex items-center gap-1.5 text-[11px]">
+                  <span class="truncate text-slate-500 dark:text-slate-400">{{ c.role || '—' }}</span>
+                  <span [ngClass]="statusFor(c).cls" class="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider">
+                    <span class="h-1 w-1 rounded-full" [ngClass]="statusFor(c).dot"></span>{{ statusFor(c).label }}
+                  </span>
+                </div>
+              </div>
+              <svg *ngIf="switchingId() === c.id" class="h-3.5 w-3.5 animate-spin text-primary-500" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+            </button>
+          </div>
+
+          <div class="flex items-center justify-between gap-1 border-t border-slate-100 px-1 py-1 dark:border-white/5">
+            <a routerLink="/select-company" (click)="showCompanyDropdown.set(false)" class="rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5">All companies</a>
+            <a routerLink="/xero-connection" (click)="showCompanyDropdown.set(false)" class="rounded-lg px-3 py-2 text-xs font-semibold text-primary-500 hover:bg-brand-50 dark:text-primary-500 dark:hover:bg-primary-500/10">Manage connection →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Open Fiscalize -->
+      <div class="relative">
+        <button type="button"
+                (click)="openFiscalize()"
+                [disabled]="openingFiscalize()"
+                title="Back to the Fiscalize platform"
+                class="flex items-center gap-1.5 rounded-xl border border-slate-200/70 bg-white/70 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-200 hover:bg-white hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/5 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10">
+          <svg *ngIf="!openingFiscalize()" class="h-4 w-4 text-primary-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 3 21 3 21 9"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h5"/>
+          </svg>
+          <svg *ngIf="openingFiscalize()" class="h-4 w-4 animate-spin text-primary-500" viewBox="0 0 24 24" fill="none">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+          </svg>
+          <span class="hidden sm:inline">{{ openingFiscalize() ? 'Opening…' : 'Fiscalize' }}</span>
+        </button>
+        <div *ngIf="fiscalizeError()" class="absolute right-0 z-50 mt-2 w-60 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700 shadow-lg fade-in-down dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">
+          {{ fiscalizeError() }}
+        </div>
+      </div>
+
+      <!-- Theme toggle -->
+      <button type="button"
+              (click)="toggleTheme()"
+              class="rounded-xl p-2 text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-900 hover:scale-[1.05] dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
+              [attr.aria-label]="theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
+        <svg *ngIf="theme() === 'dark'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+        </svg>
+        <svg *ngIf="theme() === 'light'" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <!-- Profile -->
+      <div class="relative" data-nav-dropdown>
+        <button type="button"
+                (click)="toggleProfile()"
+                class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-sm font-semibold text-white shadow-md shadow-primary-500/25 hover:scale-105 transition-transform">
+          {{ initials() }}
+        </button>
+        <div *ngIf="showProfileDropdown()"
+             class="absolute right-0 mt-2 w-64 origin-top-right rounded-xl border border-slate-200 bg-white/95 py-1.5 shadow-xl backdrop-blur-md dark:border-white/10 dark:bg-slate-900/95"
+             style="animation: fadeIn 0.18s ease-out;">
+          <div class="border-b border-slate-100 px-4 pb-3 pt-2 dark:border-white/5">
+            <div class="truncate text-sm font-semibold text-slate-900 dark:text-white">{{ user()?.name || 'Signed in' }}</div>
+            <div class="truncate text-xs text-slate-500 dark:text-slate-400">{{ user()?.email }}</div>
+          </div>
+          <a routerLink="/xero-connection" (click)="showProfileDropdown.set(false)" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5">Xero connection</a>
+          <a routerLink="/fiscalization-settings" (click)="showProfileDropdown.set(false)" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/5">Settings</a>
+          <div class="my-1 border-t border-slate-100 dark:border-white/5"></div>
+          <button type="button" (click)="logout()" class="block w-full px-4 py-2 text-left text-sm text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10">
+            Sign out
+          </button>
+          <button type="button" (click)="signOutEverywhere()" class="block w-full px-4 py-2 text-left text-xs text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/5"
+                  title="Ends your sign-in on every phone, computer and browser, for example after losing a device">
+            Sign out of all devices
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

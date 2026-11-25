@@ -1,0 +1,74 @@
+================================================================================
+HOW TO GENERATE CLIENT ID AND CLIENT SECRET FOR ZOHO BOOKS
+================================================================================
+
+1. GO TO ZOHO API CONSOLE
+   - Navigate to: https://api-console.zoho.com/
+   - Sign in with your Zoho account
+
+2. CREATE A NEW CLIENT
+   - Click "ADD CLIENT" button
+   - Select "Server-based Applications" (for web applications)
+
+3. FILL IN CLIENT DETAILS
+   - Client Name: Enter a name for your application (e.g., "FiscalyzeZoho")
+   - Homepage URL: Your application's homepage URL
+   - Authorized Redirect URIs: Add the following OAuth callback URL https://zoho.fiscalize.co.zw/redirect-url
+     
+4. GET YOUR CREDENTIALS
+   - After creating the client, you will see:
+     * Client ID: A unique identifier for your application
+     * Client Secret: A secret key (keep this secure, never expose publicly)
+
+5. CONFIGURE SCOPES
+   Required scopes for Zoho Books:
+   - ZohoBooks.fullaccess.all (full access to all Zoho Books features)
+
+   Or use specific scopes:
+   - ZohoBooks.settings.READ
+   - ZohoBooks.settings.CREATE
+   - ZohoBooks.settings.UPDATE
+   - ZohoBooks.settings.DELETE
+   - ZohoBooks.contacts.READ
+   - ZohoBooks.contacts.CREATE
+   - ZohoBooks.invoices.READ
+   - ZohoBooks.invoices.CREATE
+   - ZohoBooks.items.READ
+   - ZohoBooks.items.CREATE
+   - ZohoBooks.items.UPDATE
+
+================================================================================
+ZOHO DATA CENTERS
+================================================================================
+
+Choose the correct data center based on your Zoho account region:
+
+| Region        | Domain     | Accounts URL                    | API Base URL                        |
+|---------------|------------|--------------------------------|-------------------------------------|
+| United States | .com       | https://accounts.zoho.com      | https://www.zohoapis.com/books/v3   |
+| Europe        | .eu        | https://accounts.zoho.eu       | https://www.zohoapis.eu/books/v3    |
+| India         | .in        | https://accounts.zoho.in       | https://www.zohoapis.in/books/v3    |
+| Australia     | .com.au    | https://accounts.zoho.com.au   | https://www.zohoapis.com.au/books/v3|
+| Japan         | .jp        | https://accounts.zoho.jp       | https://www.zohoapis.jp/books/v3    |
+
+================================================================================
+OAUTH FLOW OVERVIEW
+================================================================================
+
+1. Register Client -> Get Client ID & Secret
+2. User Authorization -> Get Authorization Code
+3. Exchange Code -> Get Access Token & Refresh Token
+4. Use Access Token -> Make API calls
+5. Token Expired -> Use Refresh Token to get new Access Token
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+- Client Secret should NEVER be exposed in client-side code or public repositories
+- Access tokens expire after 1 hour
+- Refresh tokens are long-lived but can be revoked
+- Store tokens securely in your database
+- Always use HTTPS for redirect URIs in production
+
+================================================================================

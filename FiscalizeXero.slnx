@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="FiscalizeXero.Api/FiscalizeXero.Api.csproj" />
+  <Project Path="FiscalizeXero.Api.Tests/FiscalizeXero.Api.Tests.csproj" />
+  <Project Path="FiscalizeXero.Fiscalize/FiscalizeXero.Fiscalize.csproj" />
+  <Project Path="FiscalizeXero.Shared/FiscalizeXero.Shared.csproj" />
+  <Project Path="FiscalizeXero.Xero/FiscalizeXero.Xero.csproj" />
+  <Project Path="tools/XeroProbe/XeroProbe.csproj" />
+</Solution>
