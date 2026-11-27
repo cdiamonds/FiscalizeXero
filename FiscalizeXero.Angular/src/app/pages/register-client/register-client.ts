@@ -9,10 +9,11 @@ import { CompaniesService, FiscalyzeCompany } from '../../core/services/xero/com
 import { extractErrorMessage } from '../../core/utils/http-error';
 import { FiscalizeLogo } from '../../components/branding/fiscalize-logo/fiscalize-logo';
 import { ToastService } from '../../core/services/toast/toast.service';
+import { OpenFiscalize } from '../../components/open-fiscalize/open-fiscalize';
 
 @Component({
   selector: 'app-register-client',
-  imports: [CommonModule, FormsModule, FiscalizeLogo],
+  imports: [CommonModule, FormsModule, FiscalizeLogo, OpenFiscalize],
   template: `
     <div class="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-primary-50/40 dark:from-slate-950 dark:via-slate-950 dark:to-black">
       <div class="bg-blob teal"    style="top: -160px; right: -120px; width: 480px; height: 480px;"></div>
@@ -32,6 +33,7 @@ import { ToastService } from '../../core/services/toast/toast.service';
             </div>
           </div>
           <div class="flex items-center gap-2 sm:ml-auto">
+            <app-open-fiscalize variant="page"></app-open-fiscalize>
             <button type="button" (click)="goHome()"
                     class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-xs font-medium text-slate-700 transition-all duration-200 hover:bg-white hover:scale-[1.03] dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-900">
               <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2h-4a2 2 0 01-2-2v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
@@ -272,13 +274,6 @@ import { ToastService } from '../../core/services/toast/toast.service';
           <p class="text-center text-[11px] text-slate-500 dark:text-slate-400">
             You sign in on Xero's own site. Fiscalize never sees your Xero password.
           </p>
-          <button type="button" (click)="openFiscalize()" [disabled]="openingFiscalize()"
-                  class="inline-flex items-center gap-1.5 text-[11px] font-medium text-primary-600 transition-colors hover:text-primary-700 disabled:opacity-60 dark:text-primary-400 dark:hover:text-primary-300">
-            <svg *ngIf="!openingFiscalize()" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
-            <svg *ngIf="openingFiscalize()" class="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
-            {{ openingFiscalize() ? 'Opening Fiscalize…' : 'Back to Fiscalize' }}
-          </button>
-          <p *ngIf="fiscalizeError()" class="text-center text-[11px] text-rose-600 dark:text-rose-400">{{ fiscalizeError() }}</p>
         </div>
       </div>
     </div>
@@ -302,8 +297,6 @@ export class RegisterClient implements OnInit {
   readonly disconnectedName = signal<string | null>(null);
   readonly dropdownOpen = signal(false);
   readonly companySearch = signal('');
-  readonly openingFiscalize = signal(false);
-  readonly fiscalizeError = signal<string | null>(null);
   /** Show the connect card even though the active company is connected (to switch to another company). */
   readonly forceWizard = signal(false);
   readonly busy = signal(false);
@@ -462,24 +455,6 @@ export class RegisterClient implements OnInit {
   goHome(): void {
     if (this.activeCompanyAlreadySetup()) this.router.navigate(['/dashboard']);
     else this.router.navigate(['/']);
-  }
-
-  /** Return to the Fiscalize platform through a one-time launch URL minted by the API. */
-  openFiscalize(): void {
-    if (this.openingFiscalize()) return;
-    this.openingFiscalize.set(true);
-    this.fiscalizeError.set(null);
-    this.authService.openFiscalize().subscribe({
-      next: (result) => {
-        this.openingFiscalize.set(false);
-        if (result?.launchUrl) window.location.href = result.launchUrl;
-      },
-      error: (err) => {
-        this.openingFiscalize.set(false);
-        this.fiscalizeError.set(extractErrorMessage(err, 'Could not open Fiscalize.'));
-        setTimeout(() => this.fiscalizeError.set(null), 4000);
-      }
-    });
   }
 
   signOut(): void { this.authService.logout(); }

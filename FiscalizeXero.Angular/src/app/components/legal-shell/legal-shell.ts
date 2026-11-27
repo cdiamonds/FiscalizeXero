@@ -1,6 +1,7 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FiscalizeLogo } from '../branding/fiscalize-logo/fiscalize-logo';
+import { OpenFiscalize } from '../open-fiscalize/open-fiscalize';
 
 /**
  * Page frame for the public legal documents (Terms, Privacy). Header with the logo and a way back,
@@ -8,7 +9,7 @@ import { FiscalizeLogo } from '../branding/fiscalize-logo/fiscalize-logo';
  */
 @Component({
   selector: 'app-legal-shell',
-  imports: [RouterLink, FiscalizeLogo],
+  imports: [RouterLink, FiscalizeLogo, OpenFiscalize],
   template: `
     <div class="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-brand-50/40 dark:from-slate-950 dark:via-slate-950 dark:to-black">
       <div class="bg-blob teal"    style="top: -160px; right: -120px; width: 480px; height: 480px;"></div>
@@ -21,7 +22,7 @@ import { FiscalizeLogo } from '../branding/fiscalize-logo/fiscalize-logo';
             Back
           </a>
           <app-fiscalize-logo></app-fiscalize-logo>
-          <div class="w-16"></div>
+          <app-open-fiscalize></app-open-fiscalize>
         </div>
 
         <article class="legal rounded-2xl border border-white/40 bg-white/80 p-6 shadow-sm backdrop-blur-md fade-in-down sm:p-10 dark:border-white/10 dark:bg-slate-900/70" style="animation-delay: 0.05s">

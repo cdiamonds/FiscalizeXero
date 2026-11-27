@@ -104,7 +104,7 @@ namespace FiscalizeXero.Api.Controllers.Users
                     IsUsingSharedConnection = isUsingSharedConnection,
                     XeroTenantId = clientConfig?.TenantId,
                     XeroTenantName = clientConfig?.TenantName,
-                    XeroUrl = clientConfig?.TenantId != null ? XeroOptions.XeroWebUrl : null,
+                    XeroUrl = clientConfig?.TenantId != null ? XeroOptions.XeroWebUrlFor(clientConfig.OrganisationShortCode) : null,
                     NeedsReauth = needsReauth,
                     ConnectionProblem = connectionProblem ?? (scopeOutdated ? "Xero needs new permissions for Fiscalize. Re-authorize Xero to continue." : null)
                 });

@@ -31,5 +31,14 @@ namespace FiscalizeXero.Api.Services.XeroAuth
 
         /// <summary>Where "Open in Xero" links go. Xero signs the user in and shows the organisation they last used.</summary>
         public const string XeroWebUrl = "https://go.xero.com/";
+
+        /// <summary>
+        /// "Open in Xero" for one organisation: with its short code Xero opens that organisation (signing the user in first
+        /// if needed) instead of the one they last used. Without the code (not read from Xero yet) it is <see cref="XeroWebUrl"/>.
+        /// </summary>
+        public static string XeroWebUrlFor(string? organisationShortCode) =>
+            string.IsNullOrWhiteSpace(organisationShortCode)
+                ? XeroWebUrl
+                : $"{XeroWebUrl}organisationlogin/default.aspx?shortcode={Uri.EscapeDataString(organisationShortCode.Trim())}";
     }
 }

@@ -105,7 +105,7 @@ namespace FiscalizeXero.Api.Services.Auths
                             Name = clientConfig.TenantName,
                             IsSetupComplete = !string.IsNullOrEmpty(clientConfig.RefreshToken)
                         };
-                        xeroUrl = XeroAuth.XeroOptions.XeroWebUrl;
+                        xeroUrl = XeroAuth.XeroOptions.XeroWebUrlFor(clientConfig.OrganisationShortCode);
                     }
                 }
 
@@ -249,7 +249,7 @@ namespace FiscalizeXero.Api.Services.Auths
                             Name = clientConfig.TenantName,
                             IsSetupComplete = !string.IsNullOrEmpty(clientConfig.RefreshToken)
                         };
-                        xeroUrl = XeroAuth.XeroOptions.XeroWebUrl;
+                        xeroUrl = XeroAuth.XeroOptions.XeroWebUrlFor(clientConfig.OrganisationShortCode);
                     }
                 }
 
@@ -356,7 +356,7 @@ namespace FiscalizeXero.Api.Services.Auths
                             Name = clientConfig.TenantName,
                             IsSetupComplete = !string.IsNullOrEmpty(clientConfig.RefreshToken)
                         };
-                        xeroUrl = XeroAuth.XeroOptions.XeroWebUrl;
+                        xeroUrl = XeroAuth.XeroOptions.XeroWebUrlFor(clientConfig.OrganisationShortCode);
                     }
                 }
 

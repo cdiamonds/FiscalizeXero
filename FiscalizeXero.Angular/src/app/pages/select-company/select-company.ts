@@ -8,6 +8,7 @@ import { CompaniesService, FiscalyzeCompany } from '../../core/services/xero/com
 import { UserCompany } from '../../core/models/xero.models';
 import { FiscalizeLogo } from '../../components/branding/fiscalize-logo/fiscalize-logo';
 import { extractErrorMessage } from '../../core/utils/http-error';
+import { OpenFiscalize } from '../../components/open-fiscalize/open-fiscalize';
 
 const PAGE_SIZE = 20;
 
@@ -33,7 +34,7 @@ interface Choice {
  */
 @Component({
   selector: 'app-select-company',
-  imports: [CommonModule, FiscalizeLogo],
+  imports: [CommonModule, FiscalizeLogo, OpenFiscalize],
   template: `
     <div class="relative flex min-h-screen justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-brand-50/50 px-4 py-8 sm:items-center sm:py-12 dark:from-slate-950 dark:via-slate-950 dark:to-black">
       <div class="bg-blob teal"    style="top: -120px; left: -100px; width: 460px; height: 460px;"></div>
@@ -42,11 +43,14 @@ interface Choice {
       <main class="relative z-10 w-full max-w-xl scale-in" aria-labelledby="choose-title">
         <div class="mb-6 flex items-center justify-between gap-3">
           <app-fiscalize-logo></app-fiscalize-logo>
+          <div class="flex items-center gap-2">
+          <app-open-fiscalize variant="page"></app-open-fiscalize>
           <button type="button" (click)="signOut()"
                   class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-slate-200">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
             Sign out
           </button>
+          </div>
         </div>
 
         <div class="overflow-hidden rounded-2xl border border-white/40 bg-white/80 shadow-xl shadow-slate-900/[0.04] backdrop-blur-md dark:border-white/10 dark:bg-slate-900/70 dark:shadow-black/30">

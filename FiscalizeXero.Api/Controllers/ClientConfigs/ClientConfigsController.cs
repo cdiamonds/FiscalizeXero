@@ -525,7 +525,7 @@ namespace FiscalizeXero.Api.Controllers.ClientConfigs
         private string LayoutDesignerUrl()
         {
             var config = HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-            var web = (config["Fiscalize:WebUrl"] ?? "https://app.fiscalize.co.zw").TrimEnd('/');
+            var web = (config["Fiscalize:WebUrl"] ?? "https://fiscalize.co.zw").TrimEnd('/');
             return $"{web}/dashboard/plugin-layouts";
         }
 

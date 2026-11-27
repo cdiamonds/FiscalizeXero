@@ -6,6 +6,7 @@ import { interval } from 'rxjs';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { DashboardService, DashboardSummary } from '../../core/services/xero/dashboard.service';
 import { failureGuide, relativeTime, absoluteTime } from '../../core/utils/fiscal-failure';
+import { OpenXero } from '../../components/open-xero/open-xero';
 
 interface Bar {
   date: string;
@@ -22,7 +23,7 @@ const GAP = 2;
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, RouterLink, DatePipe],
+  imports: [CommonModule, RouterLink, DatePipe, OpenXero],
   template: `
     <div class="space-y-5">
       <!-- ── Header ─────────────────────────────────────────────────────── -->
@@ -40,6 +41,7 @@ const GAP = 2;
             <svg class="h-4 w-4" [class.animate-spin]="loading()" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             <span class="hidden sm:inline">Refresh</span>
           </button>
+          <app-open-xero variant="page"></app-open-xero>
           <a routerLink="/invoices"
              class="inline-flex h-10 items-center gap-2 rounded-xl bg-[var(--brand-solid)] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--brand-solid-hover)] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900">
             Invoices

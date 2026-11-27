@@ -129,26 +129,9 @@
         </div>
       </div>
 
-      <!-- Open Fiscalize -->
-      <div class="relative">
-        <button type="button"
-                (click)="openFiscalize()"
-                [disabled]="openingFiscalize()"
-                title="Back to the Fiscalize platform"
-                class="flex items-center gap-1.5 rounded-xl border border-slate-200/70 bg-white/70 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition-all duration-200 hover:bg-white hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/5 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10">
-          <svg *ngIf="!openingFiscalize()" class="h-4 w-4 text-primary-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 3 21 3 21 9"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h5"/>
-          </svg>
-          <svg *ngIf="openingFiscalize()" class="h-4 w-4 animate-spin text-primary-500" viewBox="0 0 24 24" fill="none">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
-          </svg>
-          <span class="hidden sm:inline">{{ openingFiscalize() ? 'Opening…' : 'Fiscalize' }}</span>
-        </button>
-        <div *ngIf="fiscalizeError()" class="absolute right-0 z-50 mt-2 w-60 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700 shadow-lg fade-in-down dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">
-          {{ fiscalizeError() }}
-        </div>
-      </div>
+      <!-- Open the connected Xero organisation, and go back to the Fiscalize platform -->
+      <app-open-xero></app-open-xero>
+      <app-open-fiscalize></app-open-fiscalize>
 
       <!-- Theme toggle -->
       <button type="button"

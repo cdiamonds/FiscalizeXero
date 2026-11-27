@@ -6,10 +6,11 @@ import { AuthService } from '../../core/services/auth/auth.service';
 import { FiscalizeLogo } from '../../components/branding/fiscalize-logo/fiscalize-logo';
 import { ToastService } from '../../core/services/toast/toast.service';
 import { extractErrorMessage } from '../../core/utils/http-error';
+import { OpenFiscalize } from '../../components/open-fiscalize/open-fiscalize';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, FiscalizeLogo],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FiscalizeLogo, OpenFiscalize],
   template: `
     <div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-brand-50/50 px-4 dark:from-slate-950 dark:via-slate-950 dark:to-black">
       <div class="bg-blob teal"    style="top: -120px; left: -100px; width: 460px; height: 460px;"></div>
@@ -22,7 +23,7 @@ import { extractErrorMessage } from '../../core/utils/http-error';
             Back
           </a>
           <app-fiscalize-logo></app-fiscalize-logo>
-          <div class="w-16"></div>
+          <app-open-fiscalize></app-open-fiscalize>
         </div>
 
         <div class="card-hover rounded-2xl border border-white/40 bg-white/70 p-6 shadow-xl shadow-slate-900/[0.04] backdrop-blur-md md:p-8 dark:border-white/10 dark:bg-slate-900/60 dark:shadow-black/30">

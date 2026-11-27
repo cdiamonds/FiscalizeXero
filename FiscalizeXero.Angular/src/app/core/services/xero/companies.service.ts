@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { XeroOrganisation, UserCompany } from '../../models/xero.models';
 import { LoginResponse } from '../../models/auth.models';
@@ -27,8 +27,16 @@ export class CompaniesService {
     return this.http.get<XeroOrganisation>(`${environment.apiURL}xero/organisation`);
   }
 
+  /**
+   * Where "Open Xero" goes for the active company (its organisation, when Xero has told us its short code), or null
+   * when it has no Xero connection. Kept current by every company-list read, so the top bar and pages share one answer.
+   */
+  readonly activeXeroUrl = signal<string | null>(null);
+
   myCompanies(): Observable<UserCompany[]> {
-    return this.http.get<UserCompany[]>(`${this.base}/companies`);
+    return this.http.get<UserCompany[]>(`${this.base}/companies`).pipe(
+      tap((rows) => this.activeXeroUrl.set((rows ?? []).find((c) => c.isActive)?.xeroUrl ?? null))
+    );
   }
 
   /** The user's companies on the Fiscalize platform; search and paging run on the platform. */

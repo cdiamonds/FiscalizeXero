@@ -9,6 +9,8 @@ import { CompaniesService, FiscalyzeCompany } from '../../core/services/xero/com
 import { SessionService } from '../../core/services/session/session.service';
 import { ClientConfigService } from '../../core/services/xero/client-config.service';
 import { RunningVersion, VersionService } from '../../core/services/version/version.service';
+import { OpenFiscalize } from '../open-fiscalize/open-fiscalize';
+import { OpenXero } from '../open-xero/open-xero';
 
 interface CompanyRow {
   id: number;
@@ -22,7 +24,7 @@ interface CompanyRow {
 
 @Component({
   selector: 'app-nav-bar',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, OpenFiscalize, OpenXero],
   templateUrl: './nav-bar.html',
 })
 export class NavBar implements OnInit {
@@ -50,8 +52,6 @@ export class NavBar implements OnInit {
   readonly switchError = signal<string | null>(null);
   readonly orgSearch = signal('');
   readonly reauthDismissed = signal(false);
-  readonly openingFiscalize = signal(false);
-  readonly fiscalizeError = signal<string | null>(null);
 
   @ViewChild('orgSearchInput') orgSearchInput?: ElementRef<HTMLInputElement>;
 
@@ -222,24 +222,6 @@ export class NavBar implements OnInit {
       error: (err) => {
         this.switchingId.set(null);
         this.switchError.set(err?.error?.message || err?.message || `Could not switch to ${c.friendlyName || c.name}.`);
-      }
-    });
-  }
-
-  openFiscalize(): void {
-    if (this.openingFiscalize()) return;
-    this.openingFiscalize.set(true);
-    this.fiscalizeError.set(null);
-    this.authService.openFiscalize().subscribe({
-      next: (result) => {
-        this.openingFiscalize.set(false);
-        if (result?.launchUrl) window.location.href = result.launchUrl;
-        else this.fiscalizeError.set('Could not open Fiscalize.');
-      },
-      error: (err) => {
-        this.openingFiscalize.set(false);
-        this.fiscalizeError.set(err?.error?.message || err?.message || 'Could not open Fiscalize.');
-        setTimeout(() => this.fiscalizeError.set(null), 5000);
       }
     });
   }
